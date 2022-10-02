@@ -24,12 +24,6 @@ export async function main() {
     process.env.FIFTPATH = path.join(__dirname, "..", "bin", "fiftlib");
   }
 
-  const res = child_process
-    .execSync("func -V")
-    .toString();
-
-  console.log(res)
-
   // make sure func compiler is available
   const minSupportFunc = "0.2.0";
   try {

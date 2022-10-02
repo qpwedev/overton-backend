@@ -14,11 +14,9 @@ dotenv.config();
 import fs from "fs";
 import path from "path";
 import glob from "fast-glob";
-import { Address, beginCell, Cell, CellMessage, CommonMessageInfo, fromNano, InternalMessage, serializeDict, StateInit, toNano } from "ton";
-import { TonClient, WalletContract, WalletV3R2Source, contractAddress, SendMode } from "ton";
-import { mnemonicNew, mnemonicToWalletKey } from "ton-crypto";
-
-import * as mainn from "../contracts/main";
+import { Address, beginCell, Cell, StateInit, toNano } from "ton";
+import { TonClient, WalletContract, contractAddress } from "ton";
+import { mnemonicNew } from "ton-crypto";
 
 const COMMISSION_ADDRESS = "EQC3iRufmBujI4IJKvl4eWO-14eb5zKNSCBuOg2eNnhETxAx";
 
@@ -30,7 +28,7 @@ export async function main(owner_address: string): Promise<Array<string>> {
 
   // check input arguments (given through environment variables)
   if (isTestnet) {
-    console.log(`\n* We are working with 'testnet' (https://t.me/testgiver_ton_bot will give you test TON)`);
+    console.log(`\n* We are working with 'testnet'`);
   } else {
     console.log(`\n* We are working with 'mainnet'`);
   }
@@ -97,7 +95,7 @@ export async function main(owner_address: string): Promise<Array<string>> {
     const initMessageCellSerialized = initMessageCell?.toBoc().toString('base64');
 
 
-    
+
     return [newContractAddress.toFriendly({ urlSafe: true }), sInitSerialized, initMessageCellSerialized!];
 
 

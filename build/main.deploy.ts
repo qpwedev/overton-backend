@@ -3,9 +3,6 @@ import { Address, toNano, TonClient, TupleSlice, WalletContract } from "ton";
 import { sendInternalMessageWithWallet } from "../test/helpers";
 import BN from "bn.js";
 
-const OWNER_ADDRESS = "EQC3iRufmBujI4IJKvl4eWO-14eb5zKNSCBuOg2eNnhETxAx";
-let SEND_TO_ADDRESS = "EQBVp4dc0MpeaasDZwf-0qZwT16PxxiXk326j9yrpb9RbSsM";
-
 // return the init Cell of the contract storage (according to load_data() contract method)
 export function initData(commission_address: string, owner_address: string) {
   const randomNumber = new BN(Math.floor(Math.random() * 100000));

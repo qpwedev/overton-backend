@@ -17,8 +17,7 @@ describe("Deposit and withdraw tests", () => {
     contract = await SmartContract.fromCell(
       Cell.fromBoc(hex)[0], // code cell from build output
       main.data({
-        ownerAddress: randomAddress("owner"),
-        counter: 17,
+        ownerAddress: randomAddress("owner")
       })
     );
   });
