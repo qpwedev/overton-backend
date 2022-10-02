@@ -33,7 +33,7 @@ export async function main(owner_address: string): Promise<Array<string>> {
     console.log(`\n* We are working with 'mainnet'`);
   }
 
-  // initializ e globals
+  // initialize globals
   const client = new TonClient({ endpoint: `https://${isTestnet ? "testnet." : ""}toncenter.com/api/v2/jsonRPC`, apiKey: "26a360b96446a5c9ff5a3dd16d4ae8731840d5efcb22c0a08e71be18c1662535" });
   const deployerWalletType = "org.ton.wallets.v3.r2"; // also see WalletV3R2Source class used below
   const newContractFunding = toNano(0.02); // this will be (almost in full) the balance of a new deployed contract and allow it to pay rent
@@ -85,78 +85,13 @@ export async function main(owner_address: string): Promise<Array<string>> {
 
     const newContractAddress = contractAddress({ workchain, initialData: initDataCell, initialCode: initCodeCell });
 
-
-
     const cell = beginCell().endCell();
-
     (new StateInit({ data: initDataCell, code: initCodeCell })).writeTo(cell);
-
     const sInitSerialized = cell.toBoc().toString('base64');
     const initMessageCellSerialized = initMessageCell?.toBoc().toString('base64');
 
-
-
     return [newContractAddress.toFriendly({ urlSafe: true }), sInitSerialized, initMessageCellSerialized!];
-
-
-    // // deploy by sending an internal message to the deploying wallet
-    // console.log(` - Let's deploy the contract on-chain..`);
-    // const seqno = await walletContract.getSeqNo();
-    // const transfer = walletContract.createTransfer({
-    //   secretKey: walletKey.secretKey,
-    //   seqno: seqno,
-    //   sendMode: SendMode.PAY_GAS_SEPARATLY + SendMode.IGNORE_ERRORS,
-    //   order: new InternalMessage({
-    //     to: newContractAddress,
-    //     value: newContractFunding,
-    //     bounce: false,
-    //     body: new CommonMessageInfo({
-    //       stateInit: new StateInit({ data: initDataCell, code: initCodeCell }),
-    //       body: initMessageCell !== null ? new CellMessage(initMessageCell) : null,
-    //     }),
-    //   }),
-    // });
-
-    // const data = initDataCell.toBoc().toString("base64") + initCodeCell.toBoc().toString("base64") +
-    //   await client.sendExternalMessage(walletContract, transfer);
-    // console.log(` - Deploy transaction sent successfully`);
-
-    // // make sure that the contract was deployed
-    // console.log(` - Block explorer link: https://${process.env.TESTNET ? "test." : ""}tonwhales.com/explorer/address/${newContractAddress.toFriendly()}`);
-    // console.log(` - Waiting up to 20 seconds to check if the contract was actually deployed..`);
-    // for (let attempt = 0; attempt < 10; attempt++) {
-    //   await sleep(2000);
-    //   const seqnoAfter = await walletContract.getSeqNo();
-    //   if (seqnoAfter > seqno) break;
-    // }
-    // if (await client.isContractDeployed(newContractAddress)) {
-    //   console.log(` - SUCCESS! Contract deployed successfully to address: ${newContractAddress.toFriendly()}`);
-    //   const contractBalance = await client.getBalance(newContractAddress);
-    //   console.log(` - New contract balance is now ${fromNano(contractBalance)} TON, make sure it has enough to pay rent`);
-    //   await performPostDeploymentTest(rootContract, deployInitScript, walletContract, walletKey.secretKey, newContractAddress);
-    // } else {
-    //   console.log(` - FAILUtract address still looks uninitialized: ${newContractAddress.toFriendly()}`);
-    // }
   }
-  console.log(``);
 
   return [];
 }
-
-// main().then(item => console.log(item))
-
-// helpers
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function performPostDeploymentTest(rootContract: string, deployInitScript: any, walletContract: WalletContract, secretKey: Buffer, newContractAddress: Address) {
-  if (typeof deployInitScript.postDeployTest !== "function") {
-    console.log(` - Not running a post deployment test, '${rootContract}' does not have 'postDeployTest()' function`);
-    return;
-  }
-  console.log(` - Running a post deployment test:`);
-  await deployInitScript.postDeployTest(walletContract, secretKey, newContractAddress);
-}
-

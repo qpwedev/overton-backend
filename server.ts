@@ -11,16 +11,13 @@ app.use(body_parser.json());
 
 app.post('/deploy', async (req, res) => {
     const owner_address = req.body.owner;
-
     const [contractAddress, Init, initMessage] = await deploy(owner_address);
     res.send({ ok: true, contractAddress: contractAddress, stateInit: Init, payload: initMessage })
 });
 
 app.post('/withdraw', (req, res) => {
     const send_to_address = req.body.send_to_address;
-
     const data = mainn.withdraw({ withdrawAmount: toNano(0.01), withdrawAddress: Address.parseFriendly(send_to_address).address }).toBoc().toString('base64');
-
     res.send({ payload: data });
 });
 

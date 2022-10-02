@@ -14,7 +14,7 @@ import glob from "fast-glob";
 import { Cell } from "ton";
 import semver from "semver";
 
-export async function main() {
+async function main() {
   console.log("=================================================================");
   console.log("Build script running, let's find some FunC contracts to compile..");
 
