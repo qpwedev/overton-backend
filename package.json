@@ -7,6 +7,8 @@
   "scripts": {
     "prettier": "npx prettier --write '{test,contracts,build}/**/*.{ts,js,json}'",
     "test": "node node_modules/mocha/bin/mocha --exit test/**/*.spec.ts",
+    "env": "make env",
+    "start": "ts-node server.ts",
     "build": "ts-node ./build/_build.ts",
     "deploy": "ts-node ./build/_deploy.ts",
     "deploy:testnet": "ts-node ./build/_deploy.ts",
