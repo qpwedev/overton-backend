@@ -1,0 +1,90 @@
+;; =============== storage =============================
+
+;; storage binary format is defined as TL-B in companion .tlb file
+
+#pragma version >=0.2.0;
+
+#include "imports/stdlib.fc";
+#include "imports/constants.fc";
+#include "imports/utils.fc";
+
+
+;; ДОБАВИТЬ КОМИССИЮ
+
+(slice, slice) load_data() inline {
+  var ds = get_data().begin_parse();
+  return (
+    ds~load_msg_addr(), ;; owner_address
+    ds~load_msg_addr()
+  );
+}
+
+() save_data(slice owner_address) impure inline {
+  set_data(begin_cell()
+    .store_slice(owner_address)
+    .end_cell());
+}
+
+;; =============== messages =============================
+
+;; message binary format is defined as TL-B in companion .tlb file
+
+() op_withdraw(slice owner_address, slice commission_address) impure;
+
+() recv_internal(int balance, int msg_value, cell in_msg, slice in_msg_body) impure {
+  ;; parse incoming internal message
+  slice cs = in_msg.begin_parse();
+  int flags = cs~load_uint(4); ;; int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
+  slice sender_address = cs~load_msg_addr();
+
+  ;; handle bounced messages
+  if (flags & 1) {
+    return (); ;; ignore
+  }
+
+  ;; load from contract storage
+  var(owner_address, commission_address) = load_data();
+
+  ;; handle operations
+  int op = in_msg_body~load_uint(32);
+  int query_id = in_msg_body~load_uint(64);
+  
+  if (op == op::deposit) {
+    ;; empty since ton received (msg_value) is added automatically to contract balance
+    ;; ~dump msg_value; ;; an example of debug output, requires running contract in debug mode
+    return ();
+  }
+  
+  if (op == op::withdraw) {
+    throw_unless(error::access_denied, equal_slices(sender_address, owner_address));
+    int withdraw_amount = in_msg_body~load_coins();
+    slice destination_address = in_msg_body~load_msg_addr();
+    op_withdraw(destination_address, commission_address);
+    return ();
+  }
+
+  throw(error::unknown_op);
+}
+
+() op_withdraw(slice destination_address, slice commission_address) impure {
+  var [balance, _] = get_balance();
+  int commission = 10000000;
+  int return_value = balance - const::min_tons_for_storage - commission;
+  send_grams(commission_address, commission);
+  send_grams(destination_address, return_value);
+}
+
+;; =============== getters =============================
+
+slice owner_address() method_id {
+  var (owner_address, _) = load_data();
+  return owner_address;
+}
+
+int balance() method_id {
+  var [balance, _] = get_balance();
+  return balance;
+}
+
+
+

@@ -1,0 +1,109 @@
+"Asm.fif" include
+// automatically generated from `contracts/main.fc` incl:`contracts/imports/stdlib.fc` incl:`contracts/imports/constants.fc` incl:`contracts/imports/utils.fc` 
+PROGRAM{
+  DECLPROC send_grams
+  DECLPROC load_data
+  DECLPROC save_data
+  DECLPROC op_withdraw
+  DECLPROC recv_internal
+  98265 DECLMETHOD owner_address
+  104128 DECLMETHOD balance
+  send_grams PROC:<{
+    //  address amount
+    0 PUSHINT	//  address amount _3=0
+    24 PUSHINT	//  address amount _3=0 _4=24
+    NEWC	//  address amount _3=0 _4=24 _5
+    6 STU	//  address amount _3=0 _7
+    s0 s3 XCHG2	//  _3=0 amount _7 address
+    STSLICER	//  _3=0 amount _8
+    SWAP	//  _3=0 _8 amount
+    STGRAMS	//  _3=0 _9
+    107 STU	//  _11
+    ENDC	//  msg
+    3 PUSHINT	//  msg _13=3
+    SENDRAWMSG
+  }>
+  load_data PROC:<{
+    // 
+    c4 PUSH	//  _1
+    CTOS	//  ds
+    LDMSGADDR	//  _3 ds
+    LDMSGADDR	//  _3 _10 _9
+    DROP	//  _3 _5
+  }>
+  save_data PROC:<{
+    //  owner_address
+    NEWC	//  owner_address _1
+    SWAP	//  _1 owner_address
+    STSLICER	//  _2
+    ENDC	//  _3
+    c4 POP
+  }>
+  op_withdraw PROC:<{
+    //  destination_address commission_address
+    BALANCE	//  destination_address commission_address _4
+    UNPAIR	//  destination_address commission_address _14 _15
+    DROP	//  destination_address commission_address balance
+    10000000 PUSHINT	//  destination_address commission_address balance commission=10000000
+    TUCK	//  destination_address commission_address commission=10000000 balance _9=10000000
+    SUB	//  destination_address commission_address commission=10000000 _10
+    OVER	//  destination_address commission_address commission=10000000 _10 commission=10000000
+    SUB	//  destination_address commission_address commission=10000000 return_value
+    -ROT	//  destination_address return_value commission_address commission=10000000
+    send_grams CALLDICT
+    send_grams CALLDICT
+  }>
+  recv_internal PROC:<{
+    //  balance msg_value in_msg in_msg_body
+    s3 POP
+    NIP	//  in_msg_body in_msg
+    CTOS	//  in_msg_body cs
+    4 LDU	//  in_msg_body flags cs
+    LDMSGADDR	//  in_msg_body flags _45 _44
+    DROP	//  in_msg_body flags sender_address
+    SWAP
+    1 PUSHINT	//  in_msg_body sender_address flags _13=1
+    AND	//  in_msg_body sender_address _14
+    IFJMP:<{	//  in_msg_body sender_address
+      2DROP	// 
+    }>	//  in_msg_body sender_address
+    load_data INLINECALLDICT	//  in_msg_body sender_address owner_address commission_address
+    s0 s3 XCHG	//  commission_address sender_address owner_address in_msg_body
+    32 LDU	//  commission_address sender_address owner_address op in_msg_body
+    64 LDU	//  commission_address sender_address owner_address op _51 _50
+    NIP	//  commission_address sender_address owner_address op in_msg_body
+    OVER
+    1205158801 PUSHINT	//  commission_address sender_address owner_address op in_msg_body op _26=1205158801
+    EQUAL	//  commission_address sender_address owner_address op in_msg_body _27
+    IFJMP:<{	//  commission_address sender_address owner_address op in_msg_body
+      5 BLKDROP	// 
+    }>	//  commission_address sender_address owner_address op in_msg_body
+    SWAP
+    1099131264 PUSHINT	//  commission_address sender_address owner_address in_msg_body op _28=1099131264
+    EQUAL	//  commission_address sender_address owner_address in_msg_body _29
+    IFJMP:<{	//  commission_address sender_address owner_address in_msg_body
+      -ROT	//  commission_address in_msg_body sender_address owner_address
+      SDEQ	//  commission_address in_msg_body _31
+      102 THROWIFNOT
+      LDVARUINT16	//  commission_address _53 _52
+      NIP	//  commission_address in_msg_body
+      LDMSGADDR	//  commission_address _55 _54
+      DROP	//  commission_address destination_address
+      SWAP	//  destination_address commission_address
+      op_withdraw CALLDICT
+    }>	//  commission_address sender_address owner_address in_msg_body
+    4 BLKDROP	// 
+    101 THROW
+  }>
+  owner_address PROC:<{
+    // 
+    load_data INLINECALLDICT	//  _3 _4
+    DROP	//  owner_address
+  }>
+  balance PROC:<{
+    // 
+    BALANCE	//  _2
+    UNPAIR	//  _4 _5
+    DROP	//  balance
+  }>
+}END>c
