@@ -11,8 +11,7 @@
     "start": "ts-node server.ts",
     "build": "ts-node ./build/_build.ts",
     "deploy": "ts-node ./build/_deploy.ts",
-    "deploy:testnet": "ts-node ./build/_deploy.ts",
-    "postinstall": "make && npm install && npm run dev"
+    "deploy:testnet": "ts-node ./build/_deploy.ts"
   },
   "devDependencies": {
     "@swc/core": "^1.2.177",
